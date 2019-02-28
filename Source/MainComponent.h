@@ -34,6 +34,13 @@ public:
 private:
     
     Random random;
+    
+    Array<float> waveTable;
+    double waveTableSize;
+    double freq;
+    double phase;
+    double increment;
+    double amplitude;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)

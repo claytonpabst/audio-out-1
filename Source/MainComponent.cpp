@@ -28,23 +28,27 @@ MainComponent::~MainComponent()
 //==============================================================================
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
-    // This function will be called when the audio device is started, or when
-    // its settings (i.e. sample rate, block size, etc) are changed.
-
-    // You can use this function to initialise any resources you might need,
-    // but be careful - it will be called on the audio thread, not the GUI thread.
-
-    // For more details, see the help for AudioProcessor::prepareToPlay()
+    freq = 440;
+    phase = 0;
+    waveTableSize = 1024;
+    increment = freq * waveTableSize / sampleRate;
+    amplitude = 0.10;
+    
+    for(int i=0; i<waveTableSize; i++){
+        waveTable.insert(i, sin(2.0 * double_Pi * i / waveTableSize));
+    }
 }
 
 void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill)
 {
-    for(int channel = 0; channel<bufferToFill.buffer->getNumChannels(); ++channel){
-        float* const buffer = bufferToFill.buffer->getWritePointer(channel, bufferToFill.startSample);
+    float* const leftSpeaker = bufferToFill.buffer->getWritePointer(0, bufferToFill.startSample);
+    float* const rightSpeaker = bufferToFill.buffer->getWritePointer(1, bufferToFill.startSample);
+    
+    for(int sample = 0; sample < bufferToFill.numSamples; ++sample){
+        leftSpeaker[sample] = waveTable[(int)phase] * amplitude;
+        rightSpeaker[sample] = waveTable[(int)phase] * amplitude;
         
-        for(int sample = 0; sample < bufferToFill.numSamples; ++sample){
-            buffer[sample] = (random.nextFloat() * 2.0f - 1.0f) / 0.2;
-        }
+        phase = fmod((phase + increment), waveTableSize);
     }
     
 }
