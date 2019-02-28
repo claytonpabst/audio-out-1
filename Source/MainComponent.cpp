@@ -39,13 +39,14 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRat
 
 void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill)
 {
-    // Your audio-processing code goes here!
-
-    // For more details, see the help for AudioProcessor::getNextAudioBlock()
-
-    // Right now we are not producing any data, in which case we need to clear the buffer
-    // (to prevent the output of random noise)
-    bufferToFill.clearActiveBufferRegion();
+    for(int channel = 0; channel<bufferToFill.buffer->getNumChannels(); ++channel){
+        float* const buffer = bufferToFill.buffer->getWritePointer(channel, bufferToFill.startSample);
+        
+        for(int sample = 0; sample < bufferToFill.numSamples; ++sample){
+            buffer[sample] = (random.nextFloat() * 2.0f - 1.0f) / 0.2;
+        }
+    }
+    
 }
 
 void MainComponent::releaseResources()
